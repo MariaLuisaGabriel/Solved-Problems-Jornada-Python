@@ -10,34 +10,25 @@
 # e exponho os dados filtrados em uma tabela formatada com o módulo tabulate.
 #==============================================================
 
-import requests
 from datetime import datetime
 import locale
-import telegram
 import time
+from classes import TelegramBot, CoinGeckoAPI
 
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
-bot = telegram.Bot(token='SEU TOKEN AQUI')
+bot = TelegramBot(token='SEU TOKEN AQUI', chatID=8303989749)
 
 # Resgatar o ID do chat do seu Bot...
 #   atualizacoes = bot.get_updates()
 #   print(atualizacoes[0].effective_chat.id)
 
-URL = 'https://api.coingecko.com/api/v3'
-ENDPOINT_PING = f'{URL}/ping'
-ENDPOINT_PRECO = f'{URL}/simple/price'
+api = CoinGeckoAPI(url_base='https://api.coingecko.com/api/v3')
 
 while True:
-    resposta = requests.get(ENDPOINT_PING)
     
-    if resposta.status_code == 200:
-        url = f'{ENDPOINT_PRECO}?ids=ethereum&vs_currencies=BRL&include_last_updated_at=true'
-        resposta = requests.get(url).json()
-        
-        dados_moeda = resposta.get('ethereum',None)
-        preco_brl = dados_moeda.get('brl',None)
-        atualizado_em = dados_moeda.get('last_updated_at',None)
+    if api.ping():
+        preco_brl, atualizado_em = api.get_price(coin_id='ethereum')
         
         datahora = datetime.fromtimestamp(atualizado_em).strftime('%x %X')
         
@@ -47,8 +38,9 @@ while True:
             mensagem = f'*Cotação do Ethereum (ETH)*: \n\t*Preço*: R$ {preco_brl} \n\t*Horário*: {datahora} \n\t*Motivo*: Valor maior que o máximo'
         
         if mensagem:
-            bot.send_message(chat_id=8303989749, text=mensagem, parse_mode=telegram.ParseMode.MARKDOWN)
+            bot.enviar_mensagem(mensagem=mensagem, parse_mode='MARKDOWN')
     else:
         print("API offline, tente novamente mais tarde.")
     
+    # Consulta o preço a cada 5 minutos
     time.sleep(300)
