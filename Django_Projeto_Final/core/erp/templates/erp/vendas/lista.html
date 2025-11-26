@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta title="Listar Vendas - ERP">
+</head>
+<body>
+    <h1>Listagem das Vendas Feitas</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Funcionário</th>
+                <th>Produto</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venda in vendas %}
+            {% comment %}
+                cria uma linha da tabela a cada iteração, preenchendo-a com dados da venda
+            {% endcomment %}
+            <tr>
+                <td>{{ venda.id }}</td>
+                {% comment %}na venda são cadastrados o objeto completo do funcionário e do produto, então pode acessar o que quiser deles!{% endcomment %}
+                <td>{{ venda.produto.nome }}</td>
+                <td>{{ venda.data_venda }}</td>
+                {% comment %} boa prática de redirecionamento usando a sintaxe do Django: {% endcomment %}
+                <td><a href="{% url 'erp:atualiza_venda' pk=venda.id %}">Atualizar</a></td>
+                <td><a href="{% url 'erp:deleta_venda' pk=venda.id %}">Deletar</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

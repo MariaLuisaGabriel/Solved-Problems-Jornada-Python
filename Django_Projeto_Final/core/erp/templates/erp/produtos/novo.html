@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta title="Novo Produto - ERP">
+</head>
+<body>
+    
+    <h1>Formulário para Incluir o Novo Produto</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form }}
+        
+        <button type="submit">Cadastrar</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta title="Deleção Produto - ERP">
+</head>
+<body>
+    
+    <h1>Deletar Produto {{ produto.nome }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <p>Tem certeza que deseja deletar o produto "{{ produto.nome }} ({{ produto.id }})"?</p>
+        <button type="submit">Confirmar Deleção</button>
+    </form>
+</body>
+</html>

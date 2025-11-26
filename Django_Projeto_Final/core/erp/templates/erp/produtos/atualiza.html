@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta title="Atualização de Produto - ERP">
+</head>
+<body>
+    
+    <h1>Formulário para Atualizar um Produto</h1>
+
+    {% if produto %}
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form }}
+        
+        <button type="submit">Atualizar Produto</button>
+    </form>
+    {% else %}
+        <p>Produto não encontrado.</p>
+    {% endif %}
+</body>
+</html>

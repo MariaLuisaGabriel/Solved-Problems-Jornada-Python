@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta title="Detalhes da Venda - ERP">
+</head>
+<body>
+    
+    <h1>Detalhes da Venda {{ venda.id }}</h1>
+
+    {% if venda %}
+        <ul>
+            <li><b>ID:</b> {{ venda.id }}</li>
+            <li><b>Nome do Produto:</b> {{ venda.produto.nome }}</li>
+            <li><b>Descrição do Produto:</b> {{ venda.produto.descricao }}</li>
+            <li><b>Preço do Produto:</b> {{ venda.produto.preco }}</li>
+            <li><b>Funcionário Responsável:</b> {{ venda.funcionario.nome }} {{ venda.funcionario.sobrenome }}</li>
+            <li><b>Data da Venda:</b> {{ venda.data_venda }}</li>
+        </ul>
+    {% else %}
+        <p>Venda não encontrada.</p>
+    {% endif %}
+</body>
+</html>

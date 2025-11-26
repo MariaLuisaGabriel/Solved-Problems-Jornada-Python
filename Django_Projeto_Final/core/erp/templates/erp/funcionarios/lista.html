@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta title="Listar Funcionários - ERP">
+</head>
+<body>
+    <h1>Listagem dos Funcionários Cadastrados</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Sobrenome</th>
+                <th>CPF</th>
+                <th>Email Funcional</th>
+                <th>Remuneracao</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for funcionario in funcionarios %}
+            {% comment %}
+                cria uma linha da tabela a cada iteração, preenchendo-a com dados do funcionário
+            {% endcomment %}
+            <tr>
+                <td>{{ funcionario.id }}</td>
+                <td>{{ funcionario.nome }}</td>
+                <td>{{ funcionario.sobrenome }}</td>
+                <td>{{ funcionario.cpf }}</td>
+                <td>{{ funcionario.email_funcional }}</td>
+                <td>{{ funcionario.remuneracao }} R$</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

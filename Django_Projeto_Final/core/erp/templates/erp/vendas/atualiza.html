@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta title="Atualização de Venda - ERP">
+</head>
+<body>
+    
+    <h1>Formulário para Atualizar uma Venda</h1>
+
+    {% if venda %}
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form }}
+        
+        <button type="submit">Atualizar Venda</button>
+    </form>
+    {% else %}
+        <p>Venda não encontrada.</p>
+    {% endif %}
+</body>
+</html>
