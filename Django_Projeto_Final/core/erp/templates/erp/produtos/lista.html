@@ -11,6 +11,7 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>Imagem</th>
                 <th>Nome</th>
                 <th>Descrição</th>
                 <th>Preço</th>
@@ -23,6 +24,11 @@
             {% endcomment %}
             <tr>
                 <td>{{ produto.id }}</td>
+                {% if produto.imagem %}
+                <td><img src="{{ produto.imagem.url }}" alt="Imagem do {{ produto.nome }}" width="200px"></td>
+                {% else %}
+                <td>-</td>
+                {% endif %}
                 <td>{{ produto.nome }}</td>
                 <td>{{ produto.descricao }}</td>
                 <td>{{ produto.preco }}</td>

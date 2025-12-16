@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta title="Página Inicial - ERP">
+</head>
+<body>
+    <h1>Página Inicial - ERP</h1>
+
+    {% comment %} 
+        No curso, o logout era feito com um método GET (usando um link
+        simples de redirecionamento), mas agora o Django devolve erro, pois ele exige
+        que seja usado o método POST para logout, por questões de segurança e regras do protocolo
+        HTTP.
+    {% endcomment %}
+    
+    <form method="post" action="{% url 'erp:logout' %}">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+    </form>
+</body>
+</html>

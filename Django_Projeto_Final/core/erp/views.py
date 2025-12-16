@@ -3,9 +3,20 @@ from django.http import HttpRequest, HttpResponseRedirect, Http404
 from erp.forms import FuncionarioForm, ProdutoForm
 from erp.models import Funcionario, Produto, Venda
 from django.views.generic import TemplateView, CreateView, ListView, UpdateView, DetailView, DeleteView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
+
+class ErpLoginView(LoginView):
+    template_name = 'erp/login.html'
+    redirect_authenticated_user = True # se o usuário já estiver autenticado, redireciona direto para o success_url
+    success_url = reverse_lazy('erp:dashboard')
+
+class ErpLogoutView(LogoutView):
+    template_name = 'erp/logout.html'
 
 # FBV - home
 # def home(request: HttpRequest):
@@ -17,9 +28,15 @@ from django.urls import reverse_lazy
 class HomeView(TemplateView):
     template_name='erp/index.html'
 
+class DashboardView(LoginRequiredMixin, TemplateView): # home da parte privada do sistema (após login)
+    template_name='erp/dashboard.html'
+
 # Funcionários -------------------------------------------------------------------
 # tudo FBV
 
+@login_required 
+# exige que o usuário esteja logado para acessar essa view
+# (se não tiver logado, redireciona para o login.html o app)
 def criaFuncionario(request: HttpRequest):
     
     if request.method == 'GET': # abrir o formulário
@@ -40,6 +57,7 @@ def criaFuncionario(request: HttpRequest):
             
             return HttpResponseRedirect(redirect_to='/') #volta para a raíz da aplicação
 
+@login_required 
 def listarFuncionarios(request: HttpRequest):
     
     if request.method == 'GET': # só tratamos GET pois não há dados a serem passados para listagem (é sem filtragem)
@@ -47,16 +65,7 @@ def listarFuncionarios(request: HttpRequest):
         
         return render(request, template_name='erp/funcionarios/lista.html', context={'funcionarios': funcionarios})
 
-def buscaPorID(request: HttpRequest, id: int):
-    
-    if request.method == 'GET': # só tratamos GET, pois é para busca de dados
-        try:
-            funcionario = Funcionario.objects.get(id=id) # resgata o funcionário do banco de dados que tem o ID correspondente com o passado na URL
-        except Funcionario.DoesNotExist:
-            funcionario = None
-        
-        return render(request, template_name='erp/funcionarios/detalhe.html', context={'funcionario': funcionario})
-
+@login_required 
 def atualizaFuncionario(request: HttpRequest, id: int):
     
     if request.method == 'GET': # renderizar os dados do funcionário cadastrado em um formulario para edição
@@ -76,10 +85,22 @@ def atualizaFuncionario(request: HttpRequest, id: int):
             
             return HttpResponseRedirect(redirect_to=f'/funcionarios/detalhe/{id}') # redireciona para a página de detalhes do funcionário atualizado
 
+def buscaPorID(request: HttpRequest, id: int):
+    
+    if request.method == 'GET': # só tratamos GET, pois é para busca de dados
+        try:
+            funcionario = Funcionario.objects.get(id=id) # resgata o funcionário do banco de dados que tem o ID correspondente com o passado na URL
+        except Funcionario.DoesNotExist:
+            funcionario = None
+        
+        return render(request, template_name='erp/funcionarios/detalhe.html', context={'funcionario': funcionario})
+
 # Produtos -------------------------------------------------------------------
 # tudo CBV
 
-class ProdutoCreateView(CreateView): # View que cria um novo produto
+# pus o LoginRequiredMixin primeiro para ele ser executado antes do CreateView
+# (exigir o login primeiro, acima de tudo)
+class ProdutoCreateView(LoginRequiredMixin, CreateView): # View que cria um novo produto
     template_name = 'erp/produtos/novo.html'
     model = Produto # modelo que ele usa para inserir dados no banco de dados quando essa classe é usada
     # fields = '__all__' # todos os campos do modelo Produto serão exibidos no formulário, só usado se não tiver criado classe de formulário
@@ -91,12 +112,12 @@ class ProdutoCreateView(CreateView): # View que cria um novo produto
     
     success_url = reverse_lazy('erp:home') # para onde redirecionar após o formulário ser submetido com sucesso (POST válido)
 
-class ListarProdutosView(ListView): # View que lista todos os produtos
+class ListarProdutosView(LoginRequiredMixin, ListView): # View que lista todos os produtos
     model = Produto
     template_name = 'erp/produtos/lista.html'
     context_object_name = 'produtos' # nome da variável que será usada no template para listar os produtos
 
-class AtualizarProdutoView(UpdateView): # View que atualiza um produto existente
+class AtualizarProdutoView(LoginRequiredMixin, UpdateView): # View que atualiza um produto existente
     model = Produto
     template_name = 'erp/produtos/atualiza.html'
     
@@ -113,7 +134,7 @@ class AtualizarProdutoView(UpdateView): # View que atualiza um produto existente
         except Http404: # se o produto não for encontrado, retornará None em vez de lançar exceção
             return None
 
-class DetalheProdutoView(DetailView):
+class DetalheProdutoView(LoginRequiredMixin, DetailView):
     template_name = 'erp/produtos/detalhe.html'
     model = Produto
     
@@ -126,7 +147,7 @@ class DetalheProdutoView(DetailView):
         except Http404: # se o produto não for encontrado, retornará None em vez de lançar exceção
             return None
 
-class DeletarProdutoView(DeleteView):
+class DeletarProdutoView(LoginRequiredMixin, DeleteView):
     model = Produto
     template_name = 'erp/produtos/deleta.html'
     
@@ -141,19 +162,19 @@ class DeletarProdutoView(DeleteView):
         except Http404: # se o produto não for encontrado, retornará None em vez de lançar exceção
             return None
 
-class VendaCreateView(CreateView): # View que cria um novo produto
+class VendaCreateView(LoginRequiredMixin, CreateView): # View que cria uma nova venda
     template_name = 'erp/vendas/novo.html'
     model = Venda 
     fields = ['funcionario','produto']
     
     success_url = reverse_lazy('erp:home') # para onde redirecionar após o formulário ser submetido com sucesso (POST válido)
 
-class ListarVendasView(ListView): # View que lista todos os produtos
+class ListarVendasView(LoginRequiredMixin, ListView): # View que lista todos os produtos
     model = Venda
     template_name = 'erp/vendas/lista.html'
     context_object_name = 'vendas' # nome da variável que será usada no template para listar os produtos
 
-class DetalheVendaView(DetailView):
+class DetalheVendaView(LoginRequiredMixin, DetailView):
     template_name = 'erp/vendas/detalhe.html'
     model = Venda
     
@@ -166,13 +187,13 @@ class DetalheVendaView(DetailView):
         except Http404: # se a venda não for encontrada, retornará None em vez de lançar exceção
             return None
 
-class AtualizarVendaView(UpdateView): # View que atualiza um produto existente
+class AtualizarVendaView(LoginRequiredMixin, UpdateView): # View que atualiza uma venda existente
     model = Venda
     template_name = 'erp/vendas/atualiza.html'
     
     fields = ['funcionario','produto']
     
-    success_url = reverse_lazy('erp:lista_vendas') # quando atualiza, redireciona para a listagem de produtos
+    success_url = reverse_lazy('erp:lista_vendas') # quando atualiza, redireciona para a listagem de vendas
     
     # tratar para caso uma venda não seja encontrada: (substitui a exceção Http404)
     def get_object(self, queryset=None):
@@ -181,11 +202,11 @@ class AtualizarVendaView(UpdateView): # View que atualiza um produto existente
         except Http404: # se a venda não for encontrada, retornará None em vez de lançar exceção
             return None
 
-class DeletarVendaView(DeleteView):
+class DeletarVendaView(LoginRequiredMixin, DeleteView):
     model = Venda
     template_name = 'erp/vendas/deleta.html'
     
-    context_object_name = 'venda' # variável para que o cliente confirme o produto a ser deletado
+    context_object_name = 'venda' # variável para que o cliente confirme a venda a ser deletada
     
     success_url = reverse_lazy('erp:lista_vendas')
     

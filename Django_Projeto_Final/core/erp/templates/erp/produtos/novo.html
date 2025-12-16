@@ -8,7 +8,7 @@
     
     <h1>Formulário para Incluir o Novo Produto</h1>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
         {{ form }}

@@ -1,5 +1,7 @@
 from django.urls import path
+from django.conf.urls.static import static
 from erp.views import *
+import core.settings as settings
 
 # o redirecionamento pode ser feito por caminho absoluto (ex: '/erp/'),
 # ou por nome (usando o 'name' da URL): usando reverse_lazy('app_name:name_do_path')
@@ -9,6 +11,11 @@ app_name='erp'
 urlpatterns = [
     #path('', home),  # FBV do home...
     path('', HomeView.as_view(), name='home'),  # CBV precisa do as_view() !!!
+    
+    # Login
+    path('login/', ErpLoginView.as_view(), name='login'),
+    path('logout/', ErpLogoutView.as_view(), name='logout'),
+    path('dashboard/', DashboardView.as_view(), name='dashboard'),
     
     # Funcionários -------------------------------------------------------------------
     path('funcionarios/', listarFuncionarios, name='lista_funcionarios'),
@@ -31,3 +38,7 @@ urlpatterns = [
     path('vendas/deleta/<pk>', DeletarVendaView.as_view(), name='deleta_venda'),
     path('vendas/detalhe/<pk>', DetalheVendaView.as_view(), name='detalha_venda'),
 ]
+
+# para o Django servir os arquivos de mídia
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -16,6 +16,7 @@ class Produto(models.Model):
     nome = models.CharField(max_length=50, null=False, blank=False)
     descricao = models.TextField(max_length=155, null=False, blank=False)
     preco = models.DecimalField(max_digits=7, decimal_places=2, null=False, blank=False)
+    imagem = models.ImageField(upload_to='imagens-produtos', null=True, blank=True)
     
     def __str__(self): # deixar a representação em string do objeto mais bonitinha
         return f"{self.nome} - R${self.preco} (ID: {self.id})"
